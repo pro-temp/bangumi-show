@@ -327,6 +327,7 @@ P1 交付结果：
 - 建立内部 API route 占位：搜索、详情、关联、番表、联想、数据源状态。
 - 建立 anime model、season helper、sample data、server service 和 collection repository 平台抽象。
 - 初始化 `AGENTS.md` 作为 Codex 项目规范准则。
+- 初始化 `README.md` 作为项目使用入口。
 
 P1 验证结果：
 
