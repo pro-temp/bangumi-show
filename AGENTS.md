@@ -20,6 +20,7 @@ Bangumi Show is a local-first anime lookup app for Chinese users. The MVP focuse
 - Start development server: `pnpm dev`
 - Run lint: `pnpm lint`
 - Run type checks: `pnpm typecheck`
+- Generate Next.js local types: `pnpm typegen`
 - Run unit tests: `pnpm test`
 - Run end-to-end tests: `pnpm e2e`
 - Build production app: `pnpm build`
@@ -41,6 +42,7 @@ Bangumi Show is a local-first anime lookup app for Chinese users. The MVP focuse
 - Keep platform capabilities behind adapters so Electron can replace browser implementations later.
 - Keep sample data deterministic enough for unit and e2e tests.
 - Add tests around adapters, normalizers, and core user flows as those pieces are introduced.
+- Treat `next-env.d.ts` as a generated Next.js file; do not commit it.
 
 ## UX Rules
 

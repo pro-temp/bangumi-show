@@ -56,6 +56,8 @@ pnpm build
 pnpm e2e
 ```
 
+`pnpm typecheck` 会先运行 `next typegen`，生成 Next.js 所需的本地类型文件。`next-env.d.ts` 是 Next.js 生成文件，不纳入 Git 管理。
+
 格式化代码：
 
 ```powershell
