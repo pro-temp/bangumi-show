@@ -301,6 +301,7 @@ P0 决策结果：
 - 详情形态：优先详情面板，保留查询上下文；暂不优先独立详情路由。
 - 数据源优先级：Bangumi 作为主数据源，AniList 补充字段，Jikan / MAL 只作为备选。
 - 技术栈默认：Next.js + TypeScript + React + Tailwind CSS，服务端通过 Route Handlers 或独立 adapter 层访问第三方 API。
+- 包管理器：前端工程使用 `pnpm`。
 - 桌面壳预留：后续可能封装 Electron，当前阶段必须隔离平台能力和本地持久化实现。
 
 P0 进入 P1 的条件：
@@ -314,6 +315,26 @@ P0 进入 P1 的条件：
 - 初始化 Web 应用工程。
 - 配置 TypeScript、lint、format、测试框架。
 - 建立基础页面结构和内部 API 目录。
+
+当前状态：已完成。
+
+P1 交付结果：
+
+- 初始化 Next.js + TypeScript + React + Tailwind CSS 应用骨架。
+- 使用 `pnpm` 管理依赖并提交 `pnpm-lock.yaml`。
+- 配置 ESLint、TypeScript、Vitest 和 Playwright。
+- 建立首页、当前季度番表占位、搜索入口、详情面板占位。
+- 建立内部 API route 占位：搜索、详情、关联、番表、联想、数据源状态。
+- 建立 anime model、season helper、sample data、server service 和 collection repository 平台抽象。
+- 初始化 `AGENTS.md` 作为 Codex 项目规范准则。
+
+P1 验证结果：
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm build`
+- `pnpm e2e`
 
 ### Phase 2：数据源接入
 
