@@ -9,7 +9,16 @@ export class WebCollectionRepository implements CollectionRepository {
     }
 
     const raw = window.localStorage.getItem(storageKey);
-    return raw ? (JSON.parse(raw) as CollectionItem[]) : [];
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as CollectionItem[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 
   async set(item: CollectionItem): Promise<void> {
@@ -22,5 +31,13 @@ export class WebCollectionRepository implements CollectionRepository {
     const items = await this.list();
     const next = items.filter((item) => item.animeId !== animeId);
     window.localStorage.setItem(storageKey, JSON.stringify(next));
+  }
+
+  async replace(items: CollectionItem[]): Promise<void> {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(storageKey, JSON.stringify(items));
   }
 }
