@@ -2,13 +2,18 @@
 
 :root {
   color-scheme: light;
-  --background: #f6f7fb;
+  --background: #eef2f7;
+  --chrome: #fbfcff;
+  --surface: #f4f7fb;
   --foreground: #172033;
-  --muted: #667085;
-  --line: #d7dce8;
+  --body-muted: #43516a;
+  --muted: #6a758c;
+  --line: #d8deea;
   --panel: #ffffff;
-  --accent: #2563eb;
-  --accent-soft: #e8f0ff;
+  --selected: #f8fbff;
+  --accent: #2f66e8;
+  --accent-strong: #2557ca;
+  --accent-soft: #e9f0ff;
 }
 
 * {
@@ -25,6 +30,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -36,4 +42,25 @@ select {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.result-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 104px;
+}
+
+.skeleton-block {
+  background: linear-gradient(90deg, #eef2f7 0%, #f8fafc 45%, #e9eef6 100%);
+  background-size: 220% 100%;
+  animation: skeleton-shimmer 1.15s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+
+  100% {
+    background-position: -120% 0;
+  }
 }

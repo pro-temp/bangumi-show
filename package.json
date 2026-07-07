@@ -21,6 +21,7 @@
     "@radix-ui/react-select": "^2.3.2",
     "@radix-ui/react-tabs": "^1.1.16",
     "lucide-react": "latest",
+    "motion": "^12.42.2",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"

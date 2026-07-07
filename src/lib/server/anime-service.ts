@@ -9,8 +9,11 @@ import {
   normalizeBangumiSubject,
   parseBangumiSubjectId
 } from "@/lib/sources/bangumi/normalizer";
+import type { BangumiSubject } from "@/lib/sources/bangumi/types";
 
 const animeSubjectType = 2;
+const schedulePageLimit = 50;
+const scheduleMaxResults = 300;
 const searchTtlMs = 5 * 60 * 1000;
 const scheduleTtlMs = 30 * 60 * 1000;
 const detailTtlMs = 24 * 60 * 60 * 1000;
@@ -57,7 +60,9 @@ export async function searchAnime(input: SearchInput): Promise<ApiEnvelope<Anime
         limit: 20
       });
 
-      return response.data.map((subject) => normalizeBangumiSubject(subject));
+      return response.data
+        .filter((subject) => isInScopeJapaneseAnimation(subject))
+        .map((subject) => normalizeBangumiSubject(subject));
     });
 
     return apiEnvelope({
@@ -82,19 +87,13 @@ export async function getSeasonSchedule(
 
   try {
     const result = await serverCache.getOrSet(
-      `bangumi:schedule:${year}:${season}`,
+      `bangumi:schedule:v2:${year}:${season}`,
       scheduleTtlMs,
       async () => {
-        const response = await bangumiClient.searchSubjects({
-          sort: "rank",
-          filter: {
-            type: [animeSubjectType],
-            air_date: [`>=${range.start}`, `<${range.end}`]
-          },
-          limit: 50
-        });
+        const subjects = await fetchBangumiSeasonSubjects(range);
 
-        return response.data
+        return uniqueBangumiSubjects(subjects)
+          .filter((subject) => isInScopeJapaneseAnimation(subject))
           .map((subject) => normalizeBangumiSubject(subject))
           .sort((left, right) =>
             (left.airDate ?? "9999-99-99").localeCompare(right.airDate ?? "9999-99-99")
@@ -244,6 +243,77 @@ function filterSampleAnime(query: string): AnimeWork[] {
 
     return searchable.includes(normalizedQuery);
   });
+}
+
+async function fetchBangumiSeasonSubjects(range: {
+  start: string;
+  end: string;
+}): Promise<BangumiSubject[]> {
+  const subjects: BangumiSubject[] = [];
+  let offset = 0;
+  let total: number | undefined;
+
+  while (offset < scheduleMaxResults) {
+    const response = await bangumiClient.searchSubjects({
+      sort: "rank",
+      filter: {
+        type: [animeSubjectType],
+        air_date: [`>=${range.start}`, `<${range.end}`]
+      },
+      limit: schedulePageLimit,
+      offset
+    });
+
+    subjects.push(...response.data);
+    total = response.total ?? total;
+
+    const responseOffset = response.offset ?? offset;
+    const pageSize = response.limit ?? response.data.length;
+    const nextOffset = responseOffset + (pageSize > 0 ? pageSize : schedulePageLimit);
+
+    if (response.data.length === 0) {
+      break;
+    }
+    if (total !== undefined && nextOffset >= total) {
+      break;
+    }
+    if (nextOffset <= offset) {
+      break;
+    }
+
+    offset = nextOffset;
+  }
+
+  return subjects.slice(0, scheduleMaxResults);
+}
+
+function uniqueBangumiSubjects(subjects: BangumiSubject[]): BangumiSubject[] {
+  const seen = new Set<number>();
+  return subjects.filter((subject) => {
+    if (seen.has(subject.id)) {
+      return false;
+    }
+    seen.add(subject.id);
+    return true;
+  });
+}
+
+function isInScopeJapaneseAnimation(subject: BangumiSubject): boolean {
+  const markers = [
+    subject.platform,
+    ...(subject.meta_tags ?? []),
+    ...(subject.tags?.map((tag) => tag.name) ?? [])
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (/日本|日漫|日本动画|日本動畫/.test(markers)) {
+    return true;
+  }
+
+  return !/中国|中國|国产|國產|大陆|大陸|欧美|歐美|美国|美國|韩国|韓國|英国|英國|法国|法國|加拿大|俄罗斯|俄羅斯/.test(
+    markers
+  );
 }
 
 function collectSourceLinks(items: AnimeWork[]): string[] {

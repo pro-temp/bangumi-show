@@ -1,13 +1,29 @@
-import type { ApiEnvelope, AnimeWork } from "@/lib/anime/model";
+import type { AnimeSeason, ApiEnvelope, AnimeWork } from "@/lib/anime/model";
 
 export type SchedulePayload = {
   year: number;
-  season: string;
+  season: AnimeSeason;
   items: AnimeWork[];
 };
 
-export async function fetchSchedule(): Promise<ApiEnvelope<SchedulePayload>> {
-  return fetchEnvelope<SchedulePayload>("/api/schedule");
+export type ScheduleRequest = {
+  year?: number;
+  season?: AnimeSeason;
+};
+
+export async function fetchSchedule(
+  input: ScheduleRequest = {}
+): Promise<ApiEnvelope<SchedulePayload>> {
+  const params = new URLSearchParams();
+  if (input.year) {
+    params.set("year", String(input.year));
+  }
+  if (input.season) {
+    params.set("season", input.season);
+  }
+
+  const query = params.toString();
+  return fetchEnvelope<SchedulePayload>(query ? `/api/schedule?${query}` : "/api/schedule");
 }
 
 export async function searchAnime(query: string): Promise<ApiEnvelope<AnimeWork[]>> {
