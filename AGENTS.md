@@ -29,8 +29,9 @@ Bangumi Show is a local-first anime lookup app for Chinese users. The MVP focuse
 
 - App Router pages and route handlers live under `src/app`.
 - Domain types and anime helpers live under `src/lib/anime`.
-- Server-side orchestration lives under `src/lib/server`.
-- Sample data lives under `src/lib/sample-data` until real adapters are implemented.
+- Server-side orchestration, cache, and API envelopes live under `src/lib/server`.
+- Sample data lives under `src/lib/sample-data` for fallback and Phase 2.5 flows.
+- Bangumi source adapter, raw types, and normalizer live under `src/lib/sources/bangumi`.
 - Platform-specific persistence lives under `src/lib/platform`.
 - Playwright tests live under `e2e`.
 
@@ -38,6 +39,8 @@ Bangumi Show is a local-first anime lookup app for Chinese users. The MVP focuse
 
 - Do not call third-party anime APIs directly from UI components.
 - Keep API adapters and normalizers behind server-side boundaries.
+- Keep Bangumi as the first source in service orchestration; expose source links, cache time, and warnings through the API envelope.
+- If Bangumi fails, return deterministic sample fallback data with a clear warning instead of leaking adapter errors into the UI.
 - Do not scatter direct `localStorage` calls through business logic; use a repository abstraction.
 - Keep platform capabilities behind adapters so Electron can replace browser implementations later.
 - Keep sample data deterministic enough for unit and e2e tests.
@@ -55,5 +58,5 @@ Bangumi Show is a local-first anime lookup app for Chinese users. The MVP focuse
 ## Phase Notes
 
 - Phase 1 owns project skeleton, basic page structure, config, scripts, and test wiring.
-- Phase 2 should introduce the Bangumi adapter, normalized model mapping, cache boundary, and source warnings.
+- Phase 2 introduced the Bangumi adapter, normalized model mapping, cache boundary, source status, and fallback warnings.
 - Phase 2.5 should keep sample-data flows usable while real data integration is still incomplete.
