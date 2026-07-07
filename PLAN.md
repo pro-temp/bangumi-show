@@ -344,6 +344,26 @@ P1 验证结果：
 - 增加缓存、错误处理、来源标识。
 - 使用固定样例做 adapter 测试。
 
+当前状态：已完成基础接入。
+
+P2 交付结果：
+
+- 新增 Bangumi raw types、client adapter 和 normalizer。
+- 搜索、季度番表、作品详情接口优先使用 Bangumi API。
+- 增加服务端内存缓存，区分搜索、番表和详情 TTL。
+- 增加 Bangumi API 错误处理；失败时降级到固定样例数据并写入 `warnings`。
+- `/api/sources/status` 返回 Bangumi adapter 健康状态，AniList / Jikan 仍为 planned。
+- 保留 sourceLinks、cachedAt 和来源标识，便于前端展示数据来源。
+- 增加 adapter、normalizer 和季度范围单元测试。
+
+P2 验证结果：
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm build`
+- `pnpm e2e`
+
 ### Phase 2.5：样例数据闭环
 
 - 准备固定样例数据，覆盖当前季度番表、搜索结果、作品详情、字段缺失、多来源补充。
