@@ -40,6 +40,19 @@ export function seasonLabel(season: AnimeSeason): string {
   return seasonLabels[season];
 }
 
+export function shiftSeason(
+  selection: Pick<SeasonInfo, "year" | "season">,
+  offset: number
+): Pick<SeasonInfo, "year" | "season"> {
+  const seasons: AnimeSeason[] = ["winter", "spring", "summer", "fall"];
+  const currentIndex = selection.year * seasons.length + seasons.indexOf(selection.season);
+  const nextIndex = currentIndex + offset;
+  const year = Math.floor(nextIndex / seasons.length);
+  const seasonIndex = ((nextIndex % seasons.length) + seasons.length) % seasons.length;
+
+  return { year, season: seasons[seasonIndex] };
+}
+
 export function seasonDateRange(year: number, season: AnimeSeason): { start: string; end: string } {
   const startMonth = seasonStartMonths[season];
   const endMonth = startMonth + 3;

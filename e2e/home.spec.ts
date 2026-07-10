@@ -18,7 +18,7 @@ test("searches, opens details, and stores local collection status", async ({ pag
   await page.goto("/");
 
   await page.getByPlaceholder("搜索中文名、日文名、罗马音或别名").fill("星港");
-  await page.getByRole("button", { name: "搜索" }).click();
+  await page.getByRole("button", { name: "搜索", exact: true }).click();
 
   await expect(page.getByRole("heading", { name: "搜索：星港" })).toBeVisible();
   const resultCard = page.locator("article").filter({ hasText: "星港观测者" });
@@ -34,9 +34,42 @@ test("searches, opens details, and stores local collection status", async ({ pag
 
   await resultCard.getByRole("combobox", { name: "收藏状态" }).click();
   await page.getByRole("option", { name: "想看" }).click();
-  await page.getByRole("link", { name: "收藏" }).click();
+  await page.getByRole("link", { name: "我的收藏" }).click();
 
-  await expect(page.getByRole("heading", { name: "本地收藏" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "星港观测者" })).toBeVisible();
-  await expect(page.getByText("想看")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "我的收藏" })).toBeVisible();
+  const collectionRow = page.locator("article").filter({ hasText: "星港观测者" });
+  await expect(collectionRow.getByRole("heading", { name: "星港观测者" })).toBeVisible();
+  await expect(collectionRow.getByRole("combobox", { name: "收藏状态：星港观测者" })).toHaveText(
+    /想看/
+  );
+});
+
+test("filters and updates the collection library", async ({ page }) => {
+  await page.goto("/");
+
+  const firstResult = page.locator("article").filter({ hasText: "星港观测者" });
+  await firstResult.getByRole("combobox", { name: "收藏状态" }).click();
+  await page.getByRole("option", { name: "在看" }).click();
+  await page.getByRole("link", { name: "我的收藏" }).click();
+
+  await page.getByPlaceholder("搜索收藏标题").fill("星港");
+  await expect(page.locator("article").filter({ hasText: "星港观测者" })).toBeVisible();
+  await page.getByRole("button", { name: "在看" }).click();
+  await expect(page.getByText("1 个条目")).toBeVisible();
+});
+
+test("searches and checks multiple-value tag filters", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.locator("article").filter({ hasText: "星港观测者" })).toBeVisible();
+  await page.getByRole("button", { name: "标签筛选" }).click();
+  await page.getByPlaceholder("搜索标签").fill("科幻");
+  await page.getByRole("checkbox", { name: "科幻" }).click();
+  await expect(page.getByRole("checkbox", { name: "科幻" })).toBeChecked();
+  await page.keyboard.press("Escape");
+
+  await expect(page.getByRole("button", { name: "标签筛选" })).toHaveText("科幻");
+  await expect(page.locator("article").filter({ hasText: "星港观测者" })).toBeVisible();
+  await expect(page.locator("article").filter({ hasText: "月面快递" })).toBeVisible();
+  await expect(page.locator("article").filter({ hasText: "午后茶会的魔法使" })).toHaveCount(0);
 });

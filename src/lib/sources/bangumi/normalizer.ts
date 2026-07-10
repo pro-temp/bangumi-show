@@ -9,8 +9,7 @@ export function normalizeBangumiSubject(subject: BangumiSubject, now = new Date(
   const year = airDate ? Number(airDate.slice(0, 4)) : undefined;
   const season = airDate ? seasonFromDate(new Date(`${airDate}T00:00:00Z`)) : undefined;
   const aliases = uniqueStrings([
-    ...extractInfoValues(subject.infobox, ["别名", "英文名", "日文名", "中文名", "原名"]),
-    ...(subject.meta_tags ?? [])
+    ...extractInfoValues(subject.infobox, ["别名", "英文名", "日文名", "中文名", "原名"])
   ]).filter((title) => title !== subject.name && title !== subject.name_cn);
 
   return {
@@ -115,7 +114,19 @@ function normalizeTags(subject: BangumiSubject): string[] {
   return uniqueStrings([
     ...(subject.tags?.map((tag) => tag.name) ?? []),
     ...(subject.meta_tags ?? [])
-  ]).slice(0, 12);
+  ])
+    .filter(isUsefulTag)
+    .slice(0, 12);
+}
+
+function isUsefulTag(value: string): boolean {
+  const compact = value.replace(/\s+/g, "");
+
+  if (/^(TV|WEB|ONA|OVA|OAD|Movie|电影|劇場版|剧场版|日本|日本动画|日本動畫)$/i.test(compact)) {
+    return false;
+  }
+
+  return !/^\d{4}(?:年)?$/.test(compact) && !/^\d{4}[-/.年]\d{1,2}(?:月)?$/.test(compact);
 }
 
 function extractInfoValues(

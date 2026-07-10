@@ -69,8 +69,7 @@ export async function searchAnime(input: SearchInput): Promise<ApiEnvelope<Anime
       data: result.value,
       source: "bangumi",
       sourceLinks: collectSourceLinks(result.value),
-      cachedAt: result.cachedAt,
-      warnings: result.hit ? ["Bangumi 搜索结果来自内存缓存。"] : []
+      cachedAt: result.cachedAt
     });
   } catch (error) {
     return sampleEnvelope(filterSampleAnime(query), [bangumiFallbackWarning(error)]);
@@ -109,8 +108,7 @@ export async function getSeasonSchedule(
       },
       source: "bangumi",
       sourceLinks: collectSourceLinks(result.value),
-      cachedAt: result.cachedAt,
-      warnings: result.hit ? ["Bangumi 番表来自内存缓存。"] : []
+      cachedAt: result.cachedAt
     });
   } catch (error) {
     return apiEnvelope({
@@ -148,8 +146,7 @@ export async function getAnimeDetail(id: string): Promise<ApiEnvelope<AnimeWork 
       data: result.value,
       source: "bangumi",
       sourceLinks: [bangumiSubjectUrl(subjectId)],
-      cachedAt: result.cachedAt,
-      warnings: result.hit ? ["Bangumi 详情来自内存缓存。"] : []
+      cachedAt: result.cachedAt
     });
   } catch (error) {
     return apiEnvelope({
@@ -331,6 +328,6 @@ function parseSeason(value: string | undefined): AnimeSeason | undefined {
 }
 
 function bangumiFallbackWarning(error: unknown): string {
-  const message = error instanceof Error ? error.message : "未知错误";
-  return `Bangumi API 暂不可用，已降级处理：${message}`;
+  void error;
+  return "Bangumi 暂时不可用，当前展示本地样例数据。";
 }

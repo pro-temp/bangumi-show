@@ -25,19 +25,22 @@ export const collectionStatusOptions: CollectionStatus[] = [
 export function useCollection() {
   const repository = useMemo(() => new WebCollectionRepository(), []);
   const [items, setItems] = useState<CollectionItem[]>([]);
+  const [ready, setReady] = useState(false);
 
   const reload = useCallback(async () => {
     setItems(await repository.list());
+    setReady(true);
   }, [repository]);
 
   useEffect(() => {
     void Promise.resolve().then(reload);
-  }, [reload]);
+    return repository.subscribe(() => void reload());
+  }, [reload, repository]);
 
   const setStatus = useCallback(
     async (anime: AnimeWork, status: CollectionStatus) => {
       const now = new Date().toISOString();
-      const existing = items.find((item) => item.animeId === anime.id);
+      const existing = (await repository.list()).find((item) => item.animeId === anime.id);
       const source = animeSourceId(anime);
 
       await repository.set({
@@ -55,7 +58,24 @@ export function useCollection() {
       });
       await reload();
     },
-    [items, reload, repository]
+    [reload, repository]
+  );
+
+  const updateStatus = useCallback(
+    async (animeId: string, status: CollectionStatus) => {
+      const existing = (await repository.list()).find((item) => item.animeId === animeId);
+      if (!existing) {
+        return;
+      }
+
+      await repository.set({
+        ...existing,
+        status,
+        updatedAt: new Date().toISOString()
+      });
+      await reload();
+    },
+    [reload, repository]
   );
 
   const remove = useCallback(
@@ -81,8 +101,10 @@ export function useCollection() {
   return {
     items,
     byAnimeId,
+    ready,
     reload,
     setStatus,
+    updateStatus,
     remove,
     replace
   };

@@ -21,4 +21,5 @@ export type CollectionRepository = {
   set(item: CollectionItem): Promise<void>;
   remove(animeId: string): Promise<void>;
   replace(items: CollectionItem[]): Promise<void>;
+  subscribe(listener: () => void): () => void;
 };

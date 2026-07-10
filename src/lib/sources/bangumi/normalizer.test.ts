@@ -20,7 +20,8 @@ const subject: BangumiSubject = {
   },
   tags: [
     { name: "原创", count: 20 },
-    { name: "日常", count: 10 }
+    { name: "日常", count: 10 },
+    { name: "2026", count: 1 }
   ],
   infobox: [
     {
@@ -28,7 +29,7 @@ const subject: BangumiSubject = {
       value: [{ v: "Test Anime" }, { v: "测试别名" }]
     }
   ],
-  meta_tags: ["TV", "日本动画"]
+  meta_tags: ["TV", "日本动画", "2026年7月", "漫画改"]
 };
 
 describe("normalizeBangumiSubject", () => {
@@ -52,7 +53,8 @@ describe("normalizeBangumiSubject", () => {
       imageUrl: "https://lain.bgm.tv/pic/cover/c/test.jpg"
     });
     expect(anime.titles.aliases).toContain("Test Anime");
-    expect(anime.tags).toContain("原创");
+    expect(anime.titles.aliases).not.toContain("TV");
+    expect(anime.tags).toEqual(["原创", "日常", "漫画改"]);
     expect(anime.sources[0]).toEqual({
       source: "bangumi",
       sourceId: "123",
